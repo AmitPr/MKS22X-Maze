@@ -2,16 +2,17 @@ import java.util.*;
 import java.io.*;
 
 public class Maze {
-    public static void main(String[]args){   
+    public static void main(String[] args) {
         String filename = "data2.dat";
-        try{
-          Maze f;
-          f = new Maze(filename);
-        }catch(FileNotFoundException e){
-          System.out.println("Invalid filename: "+filename);
+        try {
+            Maze f;
+            f = new Maze(filename);
+            f.setAnimate(true);
+            System.out.println(f.solve());
+        } catch (Exception e) {
+            System.out.println("Invalid filename: " + filename);
         }
-      }
-
+    }
 
     private char[][] maze;
     // Default: False
@@ -20,8 +21,7 @@ public class Maze {
     /*
      * Constructor loads a maze text file, and sets animate to false by default. 1.
      * The file contains a rectangular ascii maze, made with the following 4
-     * characters:
-     * '#' - Walls - locations that cannot be moved onto
+     * characters: '#' - Walls - locations that cannot be moved onto
      * 
      * ' ' - Empty Space - locations that can be moved onto
      * 
@@ -42,18 +42,18 @@ public class Maze {
         StringBuilder sb = new StringBuilder();
         int numLines = 0;
         int lenLines = 0;
-        while(s.hasNextLine()){
+        while (s.hasNextLine()) {
             String line = s.nextLine();
-            sb.append(line+"\n");
+            sb.append(line + "\n");
             lenLines = line.length();
             numLines++;
         }
+        s.close();
         maze = new char[numLines][lenLines];
-        System.out.println(sb.toString());
         int curLine = 0;
-        for(String line : sb.toString().split("\n")){
-            for(int i = 0; i < line.length(); i++){
-                maze[curLine][i]=line.charAt(i);
+        for (String line : sb.toString().split("\n")) {
+            for (int i = 0; i < line.length(); i++) {
+                maze[curLine][i] = line.charAt(i);
             }
             curLine++;
         }
@@ -67,17 +67,12 @@ public class Maze {
     }
 
     public void setAnimate(boolean b) {
-
         animate = b;
-
     }
 
     public void clearTerminal() {
-
         // erase terminal, go to top left of screen.
-
         System.out.println("\033[2J\033[1;1H");
-
     }
 
     /*
@@ -89,15 +84,15 @@ public class Maze {
      * 
      */
     public int solve() {
-        return 0;
-        // find the location of the S.
-
-        // erase the S
-
-        // and start solving at the location of the s.
-
-        // return solve(???,???);
-
+        for(int y = 0; y < maze.length;y++){
+            for(int x = 0; x < maze[y].length;x++){
+                if(maze[y][x]=='S'){
+                    maze[y][x]=' ';
+                    return solve(x,y,0);
+                }
+            }
+        }
+        return -1;
     }
 
     /*
@@ -117,25 +112,47 @@ public class Maze {
      * 
      * All visited spots that are part of the solution are changed to '@'
      */
-    private int solve(int row, int col) { // you can add more parameters since this is private
-
-        // automatic animation! You are welcome.
+    private int solve(int x, int y,int len) {
         if (animate) {
-
             clearTerminal();
             System.out.println(this);
-
             wait(20);
         }
-
-        // COMPLETE SOLVE
-
-        return -1; // so it compiles
+        if(maze[y][x]!='E'){
+            maze[y][x]='•';
+            if(maze[y-1][x]==' '||maze[y-1][x]=='E'){
+                int z = solve(x,y-1,len+1);
+                if(z!=-1){
+                    return z;
+                }
+            }if(maze[y][x+1]==' '||maze[y][x+1]=='E'){
+                int z = solve(x+1,y,len+1);
+                if(z!=-1){
+                    return z;
+                }
+            }if(maze[y+1][x]==' '||maze[y+1][x]=='E'){
+                int z = solve(x,y+1,len+1);
+                if(z!=-1){
+                    return z;
+                }
+            }if(maze[y][x-1]==' '||maze[y][x-1]=='E'){
+                int z = solve(x-1,y,len+1);
+                if(z!=-1){
+                    return z;
+                }
+            }
+        }else{
+            return len;
+        }
+        
+        maze[y][x]=' ';
+        return -1;
     }
-    public String toString(){
+
+    public String toString() {
         StringBuilder sb = new StringBuilder();
-        for(int y =0; y < maze.length; y++){
-            for (int x = 0; x < maze[y].length; x++){
+        for (int y = 0; y < maze.length; y++) {
+            for (int x = 0; x < maze[y].length; x++) {
                 sb.append(maze[y][x]);
             }
             sb.append("\n");
