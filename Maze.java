@@ -119,7 +119,7 @@ public class Maze {
             wait(20);
         }
         if(maze[y][x]!='E'){
-            maze[y][x]='•';
+            maze[y][x]='@';
             if(maze[y-1][x]==' '||maze[y-1][x]=='E'){
                 int z = solve(x,y-1,len+1);
                 if(z!=-1){
@@ -145,7 +145,7 @@ public class Maze {
             return len;
         }
         
-        maze[y][x]=' ';
+        maze[y][x]='.';
         return -1;
     }
 
